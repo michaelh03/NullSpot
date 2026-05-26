@@ -1,0 +1,5 @@
+module NullSpotRust {
+    header "nullspot_rust.h"
+    link "nullspot_rust"
+    export *
+}
