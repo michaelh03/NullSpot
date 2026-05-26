@@ -1,0 +1,353 @@
+/* App */
+"app.name" = "NullSpot";
+
+/* Authentication */
+"auth.connect.description" = "Verbinde deinen Spotify-Account, um zu beginnen";
+"auth.connect.button" = "Mit Spotify verbinden";
+"auth.authenticating" = "Authentifiziere...";
+"auth.loading" = "Lädt...";
+"auth.logout" = "Abmelden";
+"auth.client_id_label" = "Spotify Client ID";
+"auth.client_id_placeholder" = "Client ID eingeben";
+"auth.client_id_help_link" = "Wie bekomme ich eine Client ID?";
+"auth.client_id_existing_app_note" = "Du kannst eine vorhandene Spotify-App verwenden, wenn du die Redirect-URI com.michaelh.nullspot://callback hinzufügst";
+
+/* Navigation */
+"nav.startpage" = "Startseite";
+"nav.search_results" = "Suchergebnisse";
+"nav.favorites" = "Favoriten";
+"nav.playlists" = "Playlists";
+"nav.albums" = "Alben";
+"nav.artists" = "Künstler";
+"nav.queue" = "Warteschlange";
+"nav.speakers" = "Lautsprecher";
+"nav.library" = "Bibliothek";
+"nav.profile" = "Profil";
+"nav.back_to %@" = "Zurück zu %@";
+"nav.back" = "Zurück";
+"nav.forward_to %@" = "Vorwärts zu %@";
+"nav.forward" = "Vorwärts";
+"nav.currently_viewing" = "Aktuelle Ansicht";
+"nav.your_library" = "Deine Bibliothek";
+
+/* Common Actions */
+"action.try_again" = "Erneut versuchen";
+"action.copy_token" = "Token in Zwischenablage kopieren";
+"action.edit" = "Bearbeiten";
+"action.done" = "Fertig";
+"action.cancel" = "Abbrechen";
+"action.create" = "Erstellen";
+"action.share" = "Teilen";
+"action.link_copied" = "Link kopiert";
+
+/* Track Context Menu */
+"track.menu.play" = "Wiedergeben";
+"track.menu.play_next" = "Als Nächstes spielen";
+"track.menu.add_to_queue" = "Zur Warteschlange hinzufügen";
+"track.menu.start_radio" = "Song-Radio starten";
+"track.menu.add_to_favorites" = "Zu Favoriten hinzufügen";
+"track.menu.remove_from_favorites" = "Aus Favoriten entfernen";
+"track.menu.add_to_playlist" = "Zu Playlist hinzufügen";
+"track.menu.add_to_new_playlist" = "Zu neuer Playlist hinzufügen...";
+"track.menu.go_to_artist" = "Zum Künstler";
+"track.menu.go_to_album" = "Zum Album";
+
+/* New Playlist Dialog */
+"playlist.new.title" = "Neue Playlist";
+"playlist.new.placeholder" = "Playlist-Name";
+"playlist.new.message" = "Gib einen Namen für die neue Playlist ein";
+
+/* Playback */
+"playback.play_album" = "Album abspielen";
+"playback.play_playlist" = "Playlist abspielen";
+"playback.play_track" = "Track abspielen";
+"playback.play_top_tracks" = "Top-Tracks abspielen";
+"playback.play_tracks" = "Tracks abspielen";
+
+/* Mini Player */
+"mini_player.enter" = "Mini-Player-Modus aktivieren";
+"mini_player.restore" = "Vollständiges Fenster wiederherstellen";
+
+/* Loading States */
+"loading.favorites" = "Lade Favoriten...";
+"loading.playlists" = "Lade Playlists...";
+"loading.albums" = "Lade Alben...";
+"loading.artists" = "Lade Künstler...";
+"loading.tracks" = "Lade Tracks...";
+"loading.top_tracks" = "Lade Top-Tracks...";
+"loading.recently_played" = "Lade kürzlich gespielt...";
+
+/* Error Messages */
+"error.load_favorites" = "Laden der Favoriten fehlgeschlagen";
+"error.load_playlists" = "Laden der Playlists fehlgeschlagen";
+"error.load_albums" = "Laden der Alben fehlgeschlagen";
+"error.load_artists" = "Laden der Künstler fehlgeschlagen";
+"error.load_queue" = "Laden der Warteschlange fehlgeschlagen";
+"error.load_recently_played" = "Laden von \"Kürzlich gespielt\" fehlgeschlagen: %@";
+"error.remove_from_queue" = "Entfernen des Tracks aus der Warteschlange fehlgeschlagen";
+"error.reorder_queue" = "Umordnen der Warteschlange fehlgeschlagen";
+"error.clear_queue" = "Leeren der Warteschlange fehlgeschlagen";
+
+/* Empty States */
+"empty.select_item" = "Wähle ein Element aus der Seitenleiste";
+"empty.select_album" = "Wähle ein Album für Details";
+"empty.select_artist" = "Wähle einen Künstler für Details";
+"empty.select_playlist" = "Wähle eine Playlist für Details";
+"empty.no_favorites" = "Noch keine Favoriten";
+"empty.no_favorites.description" = "Markiere Songs in der Spotify-App als \"Gefällt mir\", um sie hier zu sehen";
+"empty.no_playlists" = "Keine Playlists gefunden";
+"empty.no_playlists.description" = "Erstelle Playlists in der Spotify-App";
+"empty.no_albums" = "Keine gespeicherten Alben";
+"empty.no_albums.description" = "Speichere Alben in der Spotify-App";
+"empty.no_artists" = "Keine gefolgten Künstler";
+"empty.no_artists.description" = "Folge Künstlern in der Spotify-App";
+"empty.queue_empty" = "Warteschlange ist leer";
+"empty.queue_empty.description" = "Spiele einen Track, Album, Playlist oder Künstler ab, um die Warteschlange zu sehen";
+
+/* Queue */
+"queue.title" = "Warteschlange";
+"queue.playing_from" = "Wiedergabe von";
+"queue.on_device" = "auf";
+"queue.song_count %lld %lld" = "%lld Songs (%lld ausstehend)";
+"queue.scroll_to_current" = "Zum aktuellen Track scrollen";
+"queue.refresh" = "Warteschlange aktualisieren";
+"queue.clear" = "Ausstehende Tracks löschen";
+"queue.clear.confirm.title" = "Warteschlange leeren";
+"queue.clear.confirm.message %lld" = "Dies entfernt %lld ausstehende Tracks aus der Warteschlange.";
+"queue.clear.confirm.action" = "Warteschlange leeren";
+
+/* Startpage Sections */
+"startpage.top_artists" = "Deine Top-Künstler";
+"startpage.top_artists.empty" = "Höre mehr Musik, um deine Top-Künstler zu sehen";
+"startpage.new_releases" = "Neuerscheinungen";
+"startpage.new_releases.empty" = "Keine Neuerscheinungen verfügbar";
+"startpage.top_albums" = "Deine Top-Alben";
+"startpage.top_albums.empty" = "Höre mehr Musik, um deine Top-Alben zu sehen";
+"startpage.empty" = "Keine Bereiche aktiviert";
+"startpage.empty.description" = "Aktiviere Bereiche in Einstellungen → Startseite";
+
+/* Recently Played */
+"recently_played.content" = "Kürzlich gespielt";
+
+/* Sections */
+"section.tracks" = "Tracks";
+"section.albums" = "Alben";
+"section.artists" = "Künstler";
+"section.playlists" = "Playlists";
+"section.top_tracks" = "Top-Tracks";
+
+/* Metadata */
+"metadata.tracks" = "%d Tracks";
+"metadata.followers" = "%@ Follower";
+"metadata.by_owner" = "Von %@";
+"metadata.separator" = "•";
+
+/* Version Info */
+"version.oauth_token" = "OAuth-Zugriffstoken";
+"version.tap_count" = "Anzahl Klicks: %d";
+
+/* Show All Button */
+"show_all.tracks" = "Alle %d Tracks anzeigen";
+
+/* Speakers */
+"speakers.title" = "Lautsprecher";
+"speakers.active" = "Aktiv";
+"speakers.empty" = "Keine Lautsprecher gefunden";
+"speakers.empty_hint" = "Öffne Spotify auf einem anderen Gerät, um es hier zu sehen";
+"speakers.error.failed_to_load" = "Lautsprecher konnten nicht geladen werden";
+"speakers.error.failed_to_transfer" = "Wiedergabe konnte nicht übertragen werden";
+"speakers.now_playing" = "Aktuell gespielt";
+"speakers.audio_output" = "AirPlay";
+"speakers.spotify_connect" = "Spotify Connect";
+"speakers.airplay_hint" = "Audio von diesem Mac auf AirPlay-Lautsprecher streamen";
+"speakers.spotify_connect_hint" = "Wiedergabe auf ein anderes Spotify-Gerät übertragen";
+
+/* Spotify Connect */
+"connect.transfer_to_computer" = "Auf diesem Computer abspielen";
+
+/* Speakers - This Computer */
+"speakers.this_computer" = "Dieser Computer";
+"speakers.this_computer.name" = "NullSpot";
+"speakers.this_computer.hint" = "Wiedergabe hierher übertragen";
+
+/* Menu Commands */
+"menu.playback" = "Wiedergabe";
+"menu.play_pause" = "Abspielen / Pause";
+"menu.next_track" = "Nächster Track";
+"menu.previous_track" = "Vorheriger Track";
+"menu.like_track" = "Track liken / unliken";
+"menu.navigate" = "Navigation";
+"menu.favorites" = "Favoriten";
+"menu.playlists" = "Playlists";
+"menu.albums" = "Alben";
+"menu.artists" = "Künstler";
+"menu.search" = "Suchen";
+"menu.refresh" = "Aktualisieren";
+
+/* Playlist Edit Mode */
+"playlist.edit" = "Bearbeiten";
+"playlist.edit.save" = "Speichern";
+"playlist.edit.cancel" = "Abbrechen";
+"playlist.edit.saving" = "Speichere...";
+
+/* Preferences */
+"preferences.playback" = "Wiedergabe";
+"preferences.info" = "Info";
+"preferences.account" = "Konto";
+"preferences.account.logout_footer" = "Du wirst abgemeldet und zum Anmeldebildschirm zurückgeleitet.";
+"preferences.streaming_quality" = "Streaming-Qualität";
+"preferences.gapless_playback" = "Lückenlose Wiedergabe";
+"preferences.default" = "Standard";
+"preferences.restart_note" = "Änderungen werden bei Neustart der Wiedergabe wirksam.";
+"preferences.version %@ (%@)" = "Version %@ (%@)";
+"preferences.copyright %@" = "© %@ Michael H";
+"preferences.speakers" = "Lautsprecher";
+"preferences.speakers.connect" = "Spotify Connect Lautsprecher anzeigen";
+"preferences.speakers.connect_description" = "NullSpot als Spotify Connect Lautsprecher registrieren und andere Connect-Geräte anzeigen. Ermöglicht Fernsteuerung vom Handy.";
+"preferences.speakers.airplay" = "AirPlay Lautsprecher anzeigen";
+"preferences.speakers.airplay_description" = "AirPlay-Ausgabeauswahl anzeigen, um Audio auf AirPlay-kompatible Lautsprecher zu streamen.";
+"preferences.speakers.none_enabled" = "Aktiviere mindestens eine Option, um den Lautsprecher-Bereich in der Seitenleiste anzuzeigen.";
+
+/* Startpage Preferences */
+"preferences.startpage.sections" = "Bereiche";
+"preferences.startpage.none_enabled" = "Die Startseite wird leer sein. Aktiviere mindestens einen Bereich, um Inhalte anzuzeigen.";
+"preferences.top_items_time_range" = "Top-Items-Zeitraum";
+"preferences.time_range.short_term" = "Letzte 4 Wochen";
+"preferences.time_range.medium_term" = "Letzte 6 Monate";
+"preferences.time_range.long_term" = "Letztes Jahr";
+
+/* Album Context Menu & Alerts */
+"album.menu.remove_from_library" = "Aus Bibliothek entfernen";
+"album.menu.add_to_library" = "Zur Bibliothek hinzufügen";
+"album.remove.title" = "Aus Bibliothek entfernen";
+"album.remove.action" = "Entfernen";
+"album.remove.message %@" = "Bist du sicher, dass du \"%@\" aus deiner Bibliothek entfernen möchtest?";
+
+/* Artist Context Menu & Alerts */
+"artist.menu.unfollow" = "Entfolgen";
+"artist.menu.follow" = "Folgen";
+"artist.unfollow.title" = "Künstler entfolgen";
+"artist.unfollow.action" = "Entfolgen";
+"artist.unfollow.message %@" = "Bist du sicher, dass du \"%@\" entfolgen möchtest?";
+"artist.show_less" = "Weniger anzeigen";
+"artist.show_all %lld" = "Alle anzeigen (%lld)";
+
+/* Playlist Context Menu & Alerts */
+"playlist.menu.edit_details" = "Details bearbeiten";
+"playlist.menu.delete" = "Playlist löschen";
+"playlist.menu.unfollow" = "Playlist entfolgen";
+"playlist.menu.follow" = "Playlist folgen";
+"playlist.edit_details.title" = "Playlist bearbeiten";
+"playlist.edit_details.name" = "Name";
+"playlist.edit_details.description" = "Beschreibung";
+"playlist.edit_details.message" = "Name und Beschreibung der Playlist bearbeiten";
+"playlist.edit_details.save" = "Speichern";
+"playlist.delete.title" = "Playlist löschen";
+"playlist.delete.action" = "Löschen";
+"playlist.delete.message %@" = "Bist du sicher, dass du \"%@\" löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.";
+"playlist.unfollow.title" = "Playlist entfolgen";
+"playlist.unfollow.action" = "Entfolgen";
+"playlist.unfollow.message %@" = "Bist du sicher, dass du \"%@\" entfolgen möchtest?";
+
+/* Connection Status */
+"connection.status" = "Verbindungsstatus";
+"connection.session" = "Sitzung";
+"connection.spirc" = "Spirc";
+"connection.spirc_ready" = "Bereit";
+"connection.spirc_not_ready" = "Nicht bereit";
+"connection.uptime" = "Laufzeit";
+"connection.reconnect_attempts" = "Wiederverbindungsversuche";
+"connection.device_id" = "Geräte-ID";
+"connection.reconnect" = "Neu verbinden";
+"connection.no_data" = "Keine Verbindungsdaten";
+"connection.connected" = "Verbunden";
+"connection.disconnected" = "Getrennt";
+
+/* Speakers */
+"speakers.librespot_connection" = "Librespot-Verbindung";
+
+/* Error Messages - Actions */
+"error.delete_playlist %@" = "Playlist konnte nicht gelöscht werden: %@";
+"error.unfollow_playlist %@" = "Playlist konnte nicht entfolgt werden: %@";
+"error.update_playlist %@" = "Playlist konnte nicht aktualisiert werden: %@";
+"error.remove_album %@" = "Album konnte nicht entfernt werden: %@";
+"error.unfollow_artist %@" = "Künstler konnte nicht entfolgt werden: %@";
+"error.follow_artist %@" = "Künstler konnte nicht gefolgt werden: %@";
+
+/* Premium Required */
+"premium.required.title" = "Spotify Premium erforderlich";
+"premium.required.logged_in_as %@" = "Angemeldet als %@";
+"premium.required.message" = "NullSpot benötigt ein Spotify Premium-Konto. Die App nutzt Spotify Connect zum Musikstreaming, was nur mit Premium verfügbar ist.";
+
+/* Session Expired */
+"session.expired.title" = "Sitzung abgelaufen";
+"session.expired.message" = "Deine Spotify-Sitzung konnte nicht mehr erneuert werden. Bitte melde dich erneut an, um fortzufahren.";
+
+/* User Not Whitelisted */
+"whitelist.title" = "Benutzer nicht registriert";
+"whitelist.message" = "Dein Spotify-Konto ist nicht für diese App registriert. Jeder Benutzer muss in der Spotify Developer Dashboard Allowlist eingetragen werden.";
+"whitelist.steps" = "So behebst du das";
+"whitelist.step1 %@" = "Nur der Besitzer der App mit Client-ID %@ kann Benutzer hinzufügen.";
+"whitelist.open_dashboard" = "Spotify Developer Dashboard öffnen";
+"whitelist.step2" = "Bitte den App-Besitzer, deine Spotify-E-Mail-Adresse unter \"User Management\" hinzuzufügen.";
+
+/* Profile */
+"profile.logged_in_as %@" = "Angemeldet als %@";
+"profile.open_in_spotify" = "In Spotify öffnen";
+"profile.email" = "E-Mail";
+"profile.country" = "Land";
+"profile.subscription" = "Abo";
+"profile.followers" = "Follower";
+
+/* API errors */
+"error.unauthorized" = "Sitzung abgelaufen – bitte erneut anmelden";
+"error.forbidden.unknown" = "Zugriff verweigert";
+"error.forbidden.premium_required" = "Spotify Premium erforderlich";
+"error.forbidden.no_active_device" = "Kein aktives Gerät – öffne Spotify auf einem Gerät";
+"error.forbidden.volume_control_disallowed" = "Lautstärkeregelung ist auf diesem Gerät nicht verfügbar";
+"error.forbidden.user_not_registered" = "Dieses Spotify-Konto ist für diese App nicht autorisiert";
+"error.forbidden.modify_library" = "Keine Berechtigung, deine Bibliothek zu ändern";
+"error.forbidden.modify_playlist" = "Keine Berechtigung, diese Playlist zu ändern";
+"error.forbidden.create_playlist" = "Keine Berechtigung, Playlists für diesen Benutzer anzulegen";
+"error.forbidden.follow_playlist" = "Keine Berechtigung, dieser Playlist zu folgen";
+"error.forbidden.modify_followed_artists" = "Keine Berechtigung, gefolgte Künstler zu ändern";
+
+/* Minimal UI */
+"minimal.app_title" = "NULLSPOT";
+"minimal.visualizer.loading" = "Titel wird geladen";
+"minimal.search" = "Suchen";
+"minimal.search_tracks" = "Titel suchen";
+"minimal.close" = "Schließen";
+"minimal.nothing_playing" = "Nichts wird abgespielt";
+"minimal.placeholder.dash" = "—";
+"minimal.previous_track" = "Vorheriger Titel";
+"minimal.play" = "Wiedergabe";
+"minimal.pause" = "Pause";
+"minimal.next_track" = "Nächster Titel";
+"minimal.shuffle" = "Zufallswiedergabe";
+"minimal.repeat" = "Wiederholen";
+"minimal.playlist.empty_title" = "Leere Playlist";
+"minimal.playlist.empty_description" = "Tippe auf die Lupe, um Titel hinzuzufügen.";
+"minimal.search.idle_title" = "Titel suchen";
+"minimal.search.idle_description" = "Tippe, um einen Titel zu finden.";
+"minimal.search.loading" = "Suche läuft…";
+"minimal.search.no_results_title" = "Keine Ergebnisse";
+"minimal.search.add" = "Zur Playlist hinzufügen";
+"minimal.search.queue_all" = "Alle Titel zur Warteschlange";
+"minimal.search.queue_latest" = "Neueste Folge einreihen";
+"minimal.search.back" = "Zurück zu Ergebnissen";
+"minimal.search.play_all" = "Alle abspielen";
+"minimal.search.filter.songs" = "Titel";
+"minimal.search.filter.albums" = "Alben";
+"minimal.search.filter.artists" = "Künstler";
+"minimal.search.filter.playlists" = "Playlists";
+"minimal.search.filter.podcasts" = "Podcasts";
+"minimal.search.recent.title" = "LETZTE SUCHEN";
+"minimal.search.playlist_owner %@" = "von %@";
+"minimal.search.show_publisher %@" = "von %@";
+"minimal.search.artist_subtitle" = "Künstler";
+"minimal.search.artist_top_tracks" = "Top-Titel";
+"minimal.search.album_type.album" = "Album";
+"minimal.search.album_type.single" = "Single";
+"minimal.search.album_type.ep" = "EP";
+"minimal.search.album_type.compilation" = "Kompilation";
