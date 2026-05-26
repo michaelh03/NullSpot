@@ -1,0 +1,276 @@
+//
+//  PlaylistService.swift
+//  NullSpot
+//
+//  Service for playlist-related operations.
+//  Handles API calls and updates AppStore on success.
+//
+
+import Foundation
+
+@MainActor
+@Observable
+final class PlaylistService {
+    private let store: AppStore
+    private var userPlaylistsTask: Task<Void, Error>?
+
+    init(store: AppStore) {
+        self.store = store
+    }
+
+    // MARK: - User Playlists
+
+    /// Load user's playlists
+    func loadUserPlaylists(session: SpotifySession, forceRefresh: Bool = false) async throws {
+        // Skip if already loaded and not forcing refresh (but only if we actually have data)
+        if store.playlistsPagination.isLoaded, !forceRefresh, !store.playlistsPagination.hasMore, !store.userPlaylistIds.isEmpty {
+            return
+        }
+
+        // Handle force refresh
+        if forceRefresh {
+            userPlaylistsTask?.cancel()
+            userPlaylistsTask = nil
+            store.playlistsPagination.reset()
+        }
+
+        // If already loading, await existing task
+        if let existingTask = userPlaylistsTask {
+            _ = try? await existingTask.value
+            return
+        }
+
+        // Create and store the loading task
+        let offset = forceRefresh ? 0 : (store.playlistsPagination.nextOffset ?? 0)
+        store.playlistsPagination.isLoading = true
+        userPlaylistsTask = Task {
+            defer {
+                self.userPlaylistsTask = nil
+                self.store.playlistsPagination.isLoading = false
+            }
+
+            let response = try await SpotifyAPI.fetchUserPlaylists(
+                session: session,
+                limit: 50,
+                offset: offset,
+            )
+
+            // Convert to unified Playlist entities
+            let playlists = response.playlists.map { Playlist(from: $0) }
+
+            // Upsert playlists into store
+            self.store.upsertPlaylists(playlists)
+
+            // Update user playlist IDs
+            let playlistIds = playlists.map(\.id)
+            if forceRefresh {
+                self.store.setUserPlaylistIds(playlistIds)
+            } else {
+                self.store.appendUserPlaylistIds(playlistIds)
+            }
+
+            // Update pagination state
+            self.store.playlistsPagination.isLoaded = true
+            self.store.playlistsPagination.hasMore = response.hasMore
+            self.store.playlistsPagination.nextOffset = response.nextOffset
+            self.store.playlistsPagination.total = response.total
+        }
+
+        try await userPlaylistsTask!.value
+    }
+
+    /// Load more playlists (pagination)
+    func loadMorePlaylists(session: SpotifySession) async throws {
+        guard store.playlistsPagination.hasMore, userPlaylistsTask == nil else {
+            return
+        }
+        try await loadUserPlaylists(session: session)
+    }
+
+    // MARK: - Playlist Details
+
+    /// Fetch playlist details and tracks
+    func fetchPlaylistDetails(playlistId: String, session: SpotifySession) async throws -> Playlist {
+        // Fetch details and tracks in parallel
+        async let detailsTask = SpotifyAPI.fetchPlaylistDetails(
+            session: session,
+            playlistId: playlistId,
+        )
+        async let tracksTask = SpotifyAPI.fetchPlaylistTracks(
+            session: session,
+            playlistId: playlistId,
+        )
+
+        let (details, playlistTracks) = try await (detailsTask, tracksTask)
+
+        // Convert tracks to unified entities and store them
+        let tracks = playlistTracks.map { Track(from: $0) }
+        store.upsertTracks(tracks)
+
+        // Calculate total duration
+        let totalDurationMs = tracks.reduce(0) { $0 + $1.durationMs }
+
+        // Create playlist with track IDs
+        let playlist = Playlist(
+            from: details,
+            trackIds: tracks.map(\.id),
+            totalDurationMs: totalDurationMs,
+        )
+
+        store.upsertPlaylist(playlist)
+        return playlist
+    }
+
+    /// Get tracks for a playlist (from store or fetch)
+    func getPlaylistTracks(playlistId: String, session: SpotifySession) async throws -> [Track] {
+        // Check if tracks are already loaded
+        if let playlist = store.playlists[playlistId], playlist.tracksLoaded {
+            return playlist.trackIds.compactMap { store.tracks[$0] }
+        }
+
+        // Fetch playlist details (which includes tracks)
+        let playlist = try await fetchPlaylistDetails(playlistId: playlistId, session: session)
+        return playlist.trackIds.compactMap { store.tracks[$0] }
+    }
+
+    // MARK: - Playlist Mutations
+
+    /// Create a new playlist
+    func createPlaylist(
+        name: String,
+        description: String? = nil,
+        session: SpotifySession,
+    ) async throws -> Playlist {
+        let response = try await SpotifyAPI.createPlaylist(
+            session: session,
+            name: name,
+            description: description,
+        )
+
+        let playlist = Playlist(from: response)
+        store.addPlaylistToUserLibrary(playlist)
+        return playlist
+    }
+
+    /// Update playlist details (name, description)
+    func updatePlaylistDetails(
+        playlistId: String,
+        name: String? = nil,
+        description: String? = nil,
+        session: SpotifySession,
+    ) async throws {
+        try await SpotifyAPI.updatePlaylistDetails(
+            session: session,
+            playlistId: playlistId,
+            name: name,
+            description: description,
+        )
+
+        // Update store on success
+        store.updatePlaylistDetails(
+            id: playlistId,
+            name: name,
+            description: description,
+        )
+    }
+
+    /// Delete a playlist
+    func deletePlaylist(playlistId: String, session: SpotifySession) async throws {
+        try await SpotifyAPI.deletePlaylist(
+            session: session,
+            playlistId: playlistId,
+        )
+
+        // Remove from store on success
+        store.removePlaylistFromUserLibrary(playlistId)
+    }
+
+    /// Follow (save) a playlist to the user's library
+    func followPlaylist(playlistId: String, session: SpotifySession) async throws {
+        try await SpotifyAPI.followPlaylist(
+            session: session,
+            playlistId: playlistId,
+        )
+
+        // Update store on success
+        store.addPlaylistToUserLibraryById(playlistId)
+    }
+
+    // MARK: - Track Operations
+
+    /// Add tracks to a playlist
+    func addTracksToPlaylist(
+        playlistId: String,
+        trackIds: [String],
+        session: SpotifySession,
+    ) async throws {
+        let trackUris = trackIds.map { "spotify:track:\($0)" }
+
+        try await SpotifyAPI.addTracksToPlaylist(
+            session: session,
+            playlistId: playlistId,
+            trackUris: trackUris,
+        )
+
+        // Update store on success
+        for trackId in trackIds {
+            store.addTrackToPlaylist(trackId, playlistId: playlistId)
+        }
+    }
+
+    /// Remove tracks from a playlist
+    func removeTracksFromPlaylist(
+        playlistId: String,
+        trackIds: [String],
+        session: SpotifySession,
+    ) async throws {
+        let trackUris = trackIds.map { "spotify:track:\($0)" }
+
+        try await SpotifyAPI.removeTracksFromPlaylist(
+            session: session,
+            playlistId: playlistId,
+            trackUris: trackUris,
+        )
+
+        // Update store on success
+        for trackId in trackIds {
+            store.removeTrackFromPlaylist(trackId, playlistId: playlistId)
+        }
+    }
+
+    /// Reorder tracks in a playlist
+    func reorderPlaylistTracks(
+        playlistId: String,
+        rangeStart: Int,
+        insertBefore: Int,
+        rangeLength: Int = 1,
+        session: SpotifySession,
+    ) async throws {
+        try await SpotifyAPI.reorderPlaylistTracks(
+            session: session,
+            playlistId: playlistId,
+            rangeStart: rangeStart,
+            insertBefore: insertBefore,
+            rangeLength: rangeLength,
+        )
+
+        // Re-fetch playlist to get updated track order
+        _ = try await fetchPlaylistDetails(playlistId: playlistId, session: session)
+    }
+
+    /// Replace all tracks in a playlist (for bulk edits like reordering/removing)
+    func replacePlaylistTracks(
+        playlistId: String,
+        trackUris: [String],
+        session: SpotifySession,
+    ) async throws {
+        try await SpotifyAPI.replacePlaylistTracks(
+            session: session,
+            playlistId: playlistId,
+            trackUris: trackUris,
+        )
+
+        // Re-fetch to update store with new track order
+        _ = try await fetchPlaylistDetails(playlistId: playlistId, session: session)
+    }
+}
