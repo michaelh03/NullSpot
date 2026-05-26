@@ -80,41 +80,66 @@ struct MinimalPlayerControls: View {
     }
 
     private var controlsRow: some View {
-        HStack(spacing: 20) {
-            MinimalTransportButton(
-                titleKey: "minimal.shuffle",
-                icon: "shuffle",
-                baseSize: MinimalTheme.transportSecondarySize,
-                isActive: playbackViewModel.isShuffleEnabled,
-                action: playbackViewModel.toggleShuffle,
+        HStack(spacing: 0) {
+            Image(systemName: "speaker.fill")
+                .font(.system(size: scrubLabelSize))
+                .foregroundStyle(MinimalTheme.muted)
+                .accessibilityHidden(true)
+                .padding(.trailing, 6)
+            Slider(
+                value: Binding(
+                    get: { playbackViewModel.remoteVolume ?? playbackViewModel.volume },
+                    set: { newValue in
+                        if playbackViewModel.remoteVolume != nil {
+                            playbackViewModel.remoteVolume = newValue
+                        }
+                        playbackViewModel.volume = newValue
+                    },
+                ),
+                in: 0 ... 1,
             )
-            MinimalTransportButton(
-                titleKey: "minimal.previous_track",
-                icon: "backward.fill",
-                baseSize: MinimalTheme.transportSecondarySize,
-                action: playbackViewModel.previous,
-            )
-            MinimalTransportButton(
-                titleKey: playbackViewModel.isPlaying ? "minimal.pause" : "minimal.play",
-                icon: playbackViewModel.isPlaying ? "pause.fill" : "play.fill",
-                baseSize: MinimalTheme.transportPrimarySize,
-                action: togglePlayPause,
-            )
-            MinimalTransportButton(
-                titleKey: "minimal.next_track",
-                icon: "forward.fill",
-                baseSize: MinimalTheme.transportSecondarySize,
-                action: playbackViewModel.next,
-            )
-            MinimalTransportButton(
-                titleKey: "minimal.repeat",
-                icon: "repeat",
-                baseSize: MinimalTheme.transportSecondarySize,
-                isActive: playbackViewModel.isRepeatEnabled,
-                action: playbackViewModel.toggleRepeat,
-            )
+            .tint(MinimalTheme.fg)
+            .controlSize(.mini)
+            .frame(width: 60)
+            .accessibilityLabel("minimal.volume")
+
+            Spacer()
+
+            HStack(spacing: 20) {
+                MinimalTransportButton(
+                    titleKey: "minimal.shuffle",
+                    icon: "shuffle",
+                    baseSize: MinimalTheme.transportSecondarySize,
+                    isActive: playbackViewModel.isShuffleEnabled,
+                    action: playbackViewModel.toggleShuffle,
+                )
+                MinimalTransportButton(
+                    titleKey: "minimal.previous_track",
+                    icon: "backward.fill",
+                    baseSize: MinimalTheme.transportSecondarySize,
+                    action: playbackViewModel.previous,
+                )
+                MinimalTransportButton(
+                    titleKey: playbackViewModel.isPlaying ? "minimal.pause" : "minimal.play",
+                    icon: playbackViewModel.isPlaying ? "pause.fill" : "play.fill",
+                    baseSize: MinimalTheme.transportPrimarySize,
+                    action: togglePlayPause,
+                )
+                MinimalTransportButton(
+                    titleKey: "minimal.next_track",
+                    icon: "forward.fill",
+                    baseSize: MinimalTheme.transportSecondarySize,
+                    action: playbackViewModel.next,
+                )
+                MinimalTransportButton(
+                    titleKey: "minimal.repeat",
+                    icon: "repeat",
+                    baseSize: MinimalTheme.transportSecondarySize,
+                    isActive: playbackViewModel.isRepeatEnabled,
+                    action: playbackViewModel.toggleRepeat,
+                )
+            }
         }
-        .frame(maxWidth: .infinity)
     }
 
     private func togglePlayPause() {

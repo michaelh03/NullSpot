@@ -326,6 +326,7 @@
 "minimal.next_track" = "Nächster Titel";
 "minimal.shuffle" = "Zufallswiedergabe";
 "minimal.repeat" = "Wiederholen";
+"minimal.volume" = "Lautstärke";
 "minimal.playlist.empty_title" = "Leere Playlist";
 "minimal.playlist.empty_description" = "Tippe auf die Lupe, um Titel hinzuzufügen.";
 "minimal.search.idle_title" = "Titel suchen";

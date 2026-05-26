@@ -321,6 +321,7 @@
 "minimal.next_track" = "Titre suivant";
 "minimal.shuffle" = "Aléatoire";
 "minimal.repeat" = "Répéter";
+"minimal.volume" = "Volume";
 "minimal.playlist.empty_title" = "Playlist vide";
 "minimal.playlist.empty_description" = "Touchez la loupe pour ajouter des titres.";
 "minimal.search.idle_title" = "Rechercher des titres";

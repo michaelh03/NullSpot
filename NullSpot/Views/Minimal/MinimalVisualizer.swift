@@ -17,7 +17,7 @@ struct MinimalVisualizer: View {
 
     private static let barGap: Double = 2
     private static let visualizerWidth: Double = 120
-    private static let maxBarHeightRatio: Double = 0.95
+    private static let maxBarHeightRatio: Double = 0.65
 
     var body: some View {
         content

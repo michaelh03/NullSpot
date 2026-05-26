@@ -321,6 +321,7 @@
 "minimal.next_track" = "Next Track";
 "minimal.shuffle" = "Shuffle";
 "minimal.repeat" = "Repeat";
+"minimal.volume" = "Volume";
 "minimal.playlist.empty_title" = "Empty playlist";
 "minimal.playlist.empty_description" = "Tap the magnifier to add tracks.";
 "minimal.search.idle_title" = "Search Tracks";
