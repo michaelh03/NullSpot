@@ -122,6 +122,7 @@ final nonisolated class VisualizerTap: @unchecked Sendable {
     /// different Space). Resumes when it becomes visible again — there's a
     /// ~100 ms cold-start lag that the hasAudio hysteresis hides.
     @MainActor func setWindowVisible(_ visible: Bool) {
+        debugLog("VisualizerTap", "setWindowVisible(\(visible)) — was \(isWindowVisible)")
         guard isWindowVisible != visible else { return }
         isWindowVisible = visible
         syncWorker()
@@ -130,13 +131,20 @@ final nonisolated class VisualizerTap: @unchecked Sendable {
     /// Called when the visualizer view enters/leaves the SwiftUI hierarchy
     /// (e.g., the header swaps it out for the search field).
     @MainActor func setMounted(_ mounted: Bool) {
+        debugLog("VisualizerTap", "setMounted(\(mounted)) — was \(isMounted)")
         guard isMounted != mounted else { return }
         isMounted = mounted
         syncWorker()
     }
 
     @MainActor private func syncWorker() {
-        if isWindowVisible, isMounted {
+        let shouldRun = isWindowVisible && isMounted
+        let isRunning = workerTask != nil
+        debugLog(
+            "VisualizerTap",
+            "syncWorker visible=\(isWindowVisible) mounted=\(isMounted) shouldRun=\(shouldRun) isRunning=\(isRunning)",
+        )
+        if shouldRun {
             startWorkerIfNeeded()
         } else {
             stopWorker()
@@ -150,6 +158,7 @@ final nonisolated class VisualizerTap: @unchecked Sendable {
 
     @MainActor private func stopWorker() {
         guard let task = workerTask else { return }
+        debugLog("VisualizerTap", "stopWorker — cancelling FFT worker")
         task.cancel()
         workerTask = nil
         // Reset published state so a stale bars frame doesn't linger if the
@@ -161,6 +170,7 @@ final nonisolated class VisualizerTap: @unchecked Sendable {
     // MARK: - Worker
 
     @MainActor private func startWorker() {
+        debugLog("VisualizerTap", "startWorker — launching FFT worker task")
         workerTask = Task.detached(priority: .userInitiated) { [weak self] in
             var smoothed = [Float](repeating: 0, count: Self.bandCount)
             var display = [Float](repeating: 0, count: Self.bandCount)
