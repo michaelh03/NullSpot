@@ -53,6 +53,19 @@ final class MinimalPlaylist {
         currentEntryId = nil
     }
 
+    /// Remove the given entries from the visible list in a single mutation. This
+    /// is a local/cosmetic change only — librespot's live playback queue is
+    /// intentionally left untouched (there is no FFI to remove an item from it).
+    /// Callers handle any playback side effects (e.g. skipping when the current
+    /// entry is among those removed).
+    func remove(entryIds ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        entries.removeAll { ids.contains($0.id) }
+        if let current = currentEntryId, ids.contains(current) {
+            currentEntryId = nil
+        }
+    }
+
     func entry(matchingUri uri: String) -> Entry? {
         entries.first { $0.track.uri == uri }
     }

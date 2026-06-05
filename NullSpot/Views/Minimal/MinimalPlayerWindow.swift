@@ -118,6 +118,7 @@ struct MinimalPlayerWindow: View {
         } else {
             MinimalPlaylistView(
                 onPlay: playEntry,
+                onRemove: removeEntries,
                 focusedField: $focusedField,
             )
             .transition(.opacity)
@@ -360,6 +361,18 @@ struct MinimalPlayerWindow: View {
         }
         Task { await playbackViewModel.playTracks(uris, session: session, resumeFrom: resumeFrom) }
         exitSearch()
+    }
+
+    /// Remove the given entries from the visible list. Local/cosmetic only — the
+    /// live librespot queue is left untouched. If the currently-playing entry is
+    /// among those removed and rows remain, skip to the next track so audio keeps
+    /// going; if nothing remains (e.g. ⌘A then Delete), playback is left alone.
+    private func removeEntries(_ ids: Set<UUID>) {
+        let removingCurrent = playlist.currentEntryId.map(ids.contains) ?? false
+        playlist.remove(entryIds: ids)
+        if removingCurrent, !playlist.entries.isEmpty {
+            playbackViewModel.next()
+        }
     }
 
     private func syncCurrentEntry(uri: String?) {
