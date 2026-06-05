@@ -346,6 +346,8 @@
 "minimal.search.recent.title" = "LETZTE SUCHEN";
 "minimal.search.playlist_owner %@" = "von %@";
 "minimal.search.show_publisher %@" = "von %@";
+"minimal.search.episode.time_left %@" = "%@ übrig";
+"minimal.search.episode.played" = "Abgespielt";
 "minimal.search.artist_subtitle" = "Künstler";
 "minimal.search.artist_top_tracks" = "Top-Titel";
 "minimal.search.album_type.album" = "Album";

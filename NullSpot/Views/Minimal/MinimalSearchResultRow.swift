@@ -17,6 +17,11 @@ struct MinimalSearchResultRow: View {
     let showsDisclosure: Bool
     let accessibilityLabel: String
     let trailingAccessibilityLabel: LocalizedStringKey
+    /// Podcast episode listening progress (0...1). When non-nil, a thin progress
+    /// bar and `progressLabel` are shown under the subtitle. Nil for music rows.
+    let progress: Double?
+    /// Caption shown next to the progress bar (e.g. "12 min left" / "Played").
+    let progressLabel: String?
     let onTap: () -> Void
     let onTrailingTap: () -> Void
     /// Bumped by the parent to trigger the "+" → ✓ animation from a path that
@@ -33,6 +38,8 @@ struct MinimalSearchResultRow: View {
         showsDisclosure: Bool = false,
         accessibilityLabel: String,
         trailingAccessibilityLabel: LocalizedStringKey,
+        progress: Double? = nil,
+        progressLabel: String? = nil,
         onTap: @escaping () -> Void,
         onTrailingTap: @escaping () -> Void,
         enqueueTrigger: Int = 0,
@@ -44,6 +51,8 @@ struct MinimalSearchResultRow: View {
         self.showsDisclosure = showsDisclosure
         self.accessibilityLabel = accessibilityLabel
         self.trailingAccessibilityLabel = trailingAccessibilityLabel
+        self.progress = progress
+        self.progressLabel = progressLabel
         self.onTap = onTap
         self.onTrailingTap = onTrailingTap
         self.enqueueTrigger = enqueueTrigger
@@ -51,6 +60,7 @@ struct MinimalSearchResultRow: View {
 
     private let titleSize: CGFloat = MinimalTheme.rowTitleSize
     private let subtitleSize: CGFloat = MinimalTheme.rowArtistSize
+    private let metaSize: CGFloat = MinimalTheme.rowMetaSize
     private let addIconSize: CGFloat = 10
     private let chevronSize: CGFloat = 10
     private let artworkSize: CGFloat = 36
@@ -72,6 +82,9 @@ struct MinimalSearchResultRow: View {
                         .font(.system(size: subtitleSize))
                         .foregroundStyle(MinimalTheme.muted)
                         .lineLimit(1)
+                    if let progress {
+                        progressView(progress)
+                    }
                 }
                 Spacer(minLength: 8)
                 Image(systemName: didEnqueue ? "checkmark" : "plus")
@@ -113,6 +126,30 @@ struct MinimalSearchResultRow: View {
             try? await Task.sleep(for: .milliseconds(1000))
             withAnimation(.easeInOut(duration: 0.2)) { didEnqueue = false }
         }
+    }
+
+    /// Thin listening-progress bar + caption shown for podcast episode rows.
+    @ViewBuilder
+    private func progressView(_ progress: Double) -> some View {
+        HStack(spacing: 6) {
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(MinimalTheme.divider)
+                    Capsule()
+                        .fill(MinimalTheme.fg)
+                        .frame(width: max(0, geo.size.width * progress))
+                }
+            }
+            .frame(width: 48, height: 3)
+            if let progressLabel {
+                Text(progressLabel)
+                    .font(.system(size: metaSize))
+                    .foregroundStyle(MinimalTheme.muted)
+                    .lineLimit(1)
+            }
+        }
+        .padding(.top, 1)
     }
 
     @ViewBuilder

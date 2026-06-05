@@ -66,6 +66,13 @@ final class PlaybackViewModel {
     private(set) var isAwaitingPlayback = false
     private var awaitingPlaybackTimeoutTask: Task<Void, Never>?
 
+    /// One-shot resume request for a podcast episode: when the matching track
+    /// loads, seek to `positionMs` so the user picks up where they left off.
+    /// Consumed on the first matching load notification, and cleared by any
+    /// manual seek or a plain (non-resuming) play so it can't leak to another
+    /// track. See `setupLoadingSubscription`.
+    private var pendingResume: (uri: String, positionMs: UInt32)?
+
     /// Returns the URI of the currently playing track (alias for currentTrackUri)
     var currentlyPlayingURI: String? {
         currentTrackUri
@@ -223,6 +230,7 @@ final class PlaybackViewModel {
             return
         }
 
+        pendingResume = nil
         isLoading = true
         errorMessage = nil
         beginAwaitingPlayback()
@@ -242,7 +250,14 @@ final class PlaybackViewModel {
         await play(uriOrUrl: "spotify:track:\(trackId)", session: session)
     }
 
-    func playTracks(_ trackUris: [String], session: SpotifySession) async {
+    /// Plays a list of track/episode URIs. When `resumeFrom` is supplied and its
+    /// `uri` matches the first track to load, playback seeks to that saved
+    /// position (used to resume a partially-played podcast episode).
+    func playTracks(
+        _ trackUris: [String],
+        session: SpotifySession,
+        resumeFrom: (uri: String, positionMs: UInt32)? = nil,
+    ) async {
         // Initialize if needed
         if !isInitialized {
             await initializeIfNeeded(session: session)
@@ -258,6 +273,7 @@ final class PlaybackViewModel {
             return
         }
 
+        pendingResume = resumeFrom
         isLoading = true
         errorMessage = nil
         beginAwaitingPlayback()
@@ -730,6 +746,18 @@ final class PlaybackViewModel {
                     positionAnchorTime = CACurrentMediaTime()
                     currentPositionMs = posMs
                 }
+
+                // Resume a partially-played podcast episode: if this is the track
+                // we have a pending resume for and librespot started it near the
+                // beginning (i.e. it didn't already auto-resume), seek to the
+                // saved position. One-shot — cleared after the first match.
+                if let resume = pendingResume, resume.uri == notification.trackUri {
+                    pendingResume = nil
+                    let loadedMs = UInt32(clamping: notification.positionMs)
+                    if loadedMs + 3000 < resume.positionMs {
+                        seek(to: resume.positionMs)
+                    }
+                }
             }
     }
 
@@ -745,6 +773,9 @@ final class PlaybackViewModel {
 
     /// Perform the actual seek operation (called after debouncing)
     private func performSeek(to positionMs: UInt32) {
+        // A real seek (manual scrub or resume) supersedes any pending resume so
+        // it can't re-fire on a later load notification for the same track.
+        pendingResume = nil
         if SpotifyPlayer.isActiveDevice {
             SpotifyPlayer.seek(positionMs: positionMs)
         } else {

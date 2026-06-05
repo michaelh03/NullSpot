@@ -485,6 +485,18 @@ struct ShowCodable: Decodable {
     }
 }
 
+/// The user's most recent position in an episode. Only present when the access
+/// token carries the `user-read-playback-position` scope.
+struct ResumePointCodable: Decodable {
+    let fullyPlayed: Bool?
+    let resumePositionMs: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case fullyPlayed = "fully_played"
+        case resumePositionMs = "resume_position_ms"
+    }
+}
+
 struct SimplifiedEpisodeCodable: Decodable {
     let id: String
     let name: String
@@ -494,6 +506,7 @@ struct SimplifiedEpisodeCodable: Decodable {
     let images: [ImageCodable]?
     let externalUrls: ExternalUrlsCodable?
     let isPlayable: Bool?
+    let resumePoint: ResumePointCodable?
 
     enum CodingKeys: String, CodingKey {
         case id, name, uri, images
@@ -501,6 +514,7 @@ struct SimplifiedEpisodeCodable: Decodable {
         case releaseDate = "release_date"
         case externalUrls = "external_urls"
         case isPlayable = "is_playable"
+        case resumePoint = "resume_point"
     }
 }
 

@@ -79,8 +79,23 @@ struct Track: Identifiable, Hashable, Codable {
     let albumName: String?
     let images: ImageSet
 
+    // Podcast episode resume state. Only populated for synthetic episode tracks
+    // when the token carries the `user-read-playback-position` scope; nil for
+    // regular music tracks. Defaults keep the memberwise init backward-compatible.
+    var resumePositionMs: Int? = nil
+    var fullyPlayed: Bool? = nil
+
     var durationFormatted: String {
         formatTrackTime(milliseconds: durationMs)
+    }
+
+    /// 0...1 listening progress for a podcast episode, or nil when there's no
+    /// meaningful progress to show (a regular track, or an episode the user
+    /// hasn't started). A finished episode reports a full bar.
+    var resumeProgress: Double? {
+        if fullyPlayed == true { return 1 }
+        guard let resumePositionMs, resumePositionMs > 0, durationMs > 0 else { return nil }
+        return min(Double(resumePositionMs) / Double(durationMs), 1)
     }
 
     /// Returns externalUrl if available, otherwise generates from ID

@@ -157,6 +157,8 @@ struct MinimalSearchDetailView: View {
                             isSelected: idx == selectedIndex,
                             accessibilityLabel: "\(track.name), \(track.artistName)",
                             trailingAccessibilityLabel: "minimal.search.add",
+                            progress: track.resumeProgress,
+                            progressLabel: progressLabel(for: track),
                             onTap: {
                                 selectedIndex = idx
                                 onPlayTrack(track, tracks)
@@ -180,6 +182,20 @@ struct MinimalSearchDetailView: View {
     }
 
     // MARK: - Derived
+
+    /// Caption shown beside an episode's progress bar: "Played" for finished
+    /// episodes, otherwise the remaining time ("12 min left"). Nil for tracks
+    /// without resume data (regular music, unplayed episodes).
+    private func progressLabel(for track: Track) -> String? {
+        if track.fullyPlayed == true {
+            return String(localized: "minimal.search.episode.played")
+        }
+        guard let resumePositionMs = track.resumePositionMs, resumePositionMs > 0 else {
+            return nil
+        }
+        let remaining = max(0, track.durationMs - resumePositionMs)
+        return String(localized: "minimal.search.episode.time_left \(formatDuration(milliseconds: remaining))")
+    }
 
     private var title: String {
         switch detail {

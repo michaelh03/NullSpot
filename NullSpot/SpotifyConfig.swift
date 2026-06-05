@@ -40,5 +40,6 @@ enum SpotifyConfig {
         "user-follow-read",
         "user-read-recently-played",
         "user-top-read",
+        "user-read-playback-position",
     ]
 }

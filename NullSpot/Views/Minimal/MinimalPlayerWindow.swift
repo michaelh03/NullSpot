@@ -353,7 +353,12 @@ struct MinimalPlayerWindow: View {
         playlist.currentEntryId = pickedEntryId
         let uris = playlist.urisStarting(at: pickedEntryId)
         guard !uris.isEmpty else { return }
-        Task { await playbackViewModel.playTracks(uris, session: session) }
+        // Resume a partially-played podcast episode from its saved position.
+        var resumeFrom: (uri: String, positionMs: UInt32)?
+        if picked.fullyPlayed != true, let pos = picked.resumePositionMs, pos > 0 {
+            resumeFrom = (picked.uri, UInt32(clamping: pos))
+        }
+        Task { await playbackViewModel.playTracks(uris, session: session, resumeFrom: resumeFrom) }
         exitSearch()
     }
 

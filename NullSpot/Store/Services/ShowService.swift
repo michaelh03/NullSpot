@@ -55,6 +55,8 @@ final class ShowService {
                 artistName: showName,
                 albumName: showName,
                 images: images,
+                resumePositionMs: episode.resumePoint?.resumePositionMs,
+                fullyPlayed: episode.resumePoint?.fullyPlayed,
             )
         }
     }
