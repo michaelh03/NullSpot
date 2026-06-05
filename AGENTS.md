@@ -30,18 +30,17 @@ Also read `AGENTS-twostraws.md` for general development guidelines and best prac
 
 ## Network Request Logging
 
-All Spotify API network requests must include debug logging. Add a log statement after constructing the URL string, wrapped in `#if DEBUG`:
+All Spotify API network requests must include debug logging. Add a log statement after constructing the URL string:
 
 ```swift
 let urlString = "\(baseURL)/endpoint"
-#if DEBUG
-    apiLogger.debug("[METHOD] \(urlString)")
-#endif
+debugLog("SpotifyAPI", "[METHOD] \(urlString)")
 ```
 
 - Use the appropriate HTTP method: `[GET]`, `[POST]`, `[PUT]`, `[DELETE]`
-- The `apiLogger` is defined at the top of `SpotifyAPI.swift`
-- Logs are only compiled in debug builds (zero overhead in release)
+- `debugLog(_ module:_ message:)` is defined in `NullSpot/DebugLog.swift`; pass `"SpotifyAPI"` as the module for API requests
+- It is a no-op in release builds (compiled to an empty `@inlinable` stub via `#if DEBUG`), so a bare call needs no `#if DEBUG` guard. Only wrap in `#if DEBUG` when the log line does extra work (e.g. decoding the response body for a richer message)
+- API endpoints live in `SpotifyAPI/` (`SpotifyAPI.swift` plus `SpotifyAPI+*.swift` extensions)
 
 ## State Management Architecture
 
