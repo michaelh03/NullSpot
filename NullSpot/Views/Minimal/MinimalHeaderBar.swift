@@ -7,6 +7,7 @@ import SwiftUI
 
 struct MinimalHeaderBar: View {
     @Environment(AppStore.self) private var store
+    @Environment(MinimalPlaylist.self) private var playlist
 
     @Binding var isSearching: Bool
     @Binding var searchText: String
@@ -108,10 +109,19 @@ struct MinimalHeaderBar: View {
     // Spirc's loading callback) over store.currentTrackEntity, which waits for the
     // Mercury queue update + debounced metadata fetch.
     private var currentTrack: Track? {
-        if let uri = PlaybackViewModel.shared.currentTrackUri,
-           let trackId = SpotifyAPI.parseTrackURI(uri),
-           let track = store.tracks[trackId] {
-            return track
+        if let uri = PlaybackViewModel.shared.currentTrackUri {
+            // The local playlist holds the full Track for everything we've played,
+            // including synthetic podcast-episode tracks (spotify:episode:...) that
+            // the store's tracks table / parseTrackURI don't cover — so the episode
+            // title + show name surface here just like a song's title + artist.
+            if let entry = playlist.entry(matchingUri: uri) {
+                return entry.track
+            }
+            if let trackId = SpotifyAPI.parseTrackURI(uri),
+               let track = store.tracks[trackId]
+            {
+                return track
+            }
         }
         return store.currentTrackEntity
     }
