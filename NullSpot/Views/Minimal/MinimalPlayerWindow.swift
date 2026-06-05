@@ -96,7 +96,6 @@ struct MinimalPlayerWindow: View {
                     focusedField: $focusedField,
                     onBack: { searchDetail = nil },
                     onPlayAll: { playAllForDetail(detail) },
-                    onPlayTrack: { track, all in playFromDetail(picked: track, allTracks: all) },
                     onPickTrack: { track in pickTrack(track) },
                     onEnqueueTrack: { track in
                         playlist.append(track)
@@ -117,7 +116,7 @@ struct MinimalPlayerWindow: View {
             }
         } else {
             MinimalPlaylistView(
-                onPlay: playEntry,
+                onPlay: { playEntry($0) },
                 onRemove: removeEntries,
                 focusedField: $focusedField,
             )
@@ -206,73 +205,73 @@ struct MinimalPlayerWindow: View {
     private func playAllForDetail(_ detail: MinimalSearchDetail) {
         switch detail {
         case let .album(album):
-            Task { await replaceAndPlay(forAlbum: album) }
+            Task { await appendAndPlay(forAlbum: album) }
         case let .artist(artist):
-            Task { await replaceAndPlay(forArtist: artist) }
+            Task { await appendAndPlay(forArtist: artist) }
         case let .playlist(pl):
-            Task { await replaceAndPlay(forPlaylist: pl) }
+            Task { await appendAndPlay(forPlaylist: pl) }
         case let .show(show):
-            Task { await replaceAndPlay(forShow: show) }
+            Task { await appendAndPlay(forShow: show) }
         }
         exitSearch()
     }
 
-    private func replaceAndPlay(forAlbum album: Album) async {
+    private func appendAndPlay(forAlbum album: Album) async {
         let tracks = await (try? albumService.getAlbumTracks(albumId: album.id, session: session)) ?? []
-        playlist.clear()
-        for track in tracks {
-            playlist.append(track)
-        }
-        await playbackViewModel.play(uriOrUrl: album.uri, session: session)
+        appendAndPlay(tracks)
     }
 
-    private func replaceAndPlay(forArtist artist: Artist) async {
+    private func appendAndPlay(forArtist artist: Artist) async {
         let tracks = await (try? artistService.fetchArtistTopTracks(
             artistId: artist.id,
             session: session,
         )) ?? []
-        guard !tracks.isEmpty else { return }
-        playlist.clear()
-        for track in tracks {
-            playlist.append(track)
-        }
-        await playbackViewModel.playTracks(tracks.map(\.uri), session: session)
+        appendAndPlay(tracks)
     }
 
-    private func replaceAndPlay(forPlaylist pl: Playlist) async {
+    private func appendAndPlay(forPlaylist pl: Playlist) async {
         let tracks = await (try? playlistService.getPlaylistTracks(playlistId: pl.id, session: session)) ?? []
-        playlist.clear()
-        for track in tracks {
-            playlist.append(track)
-        }
-        await playbackViewModel.play(uriOrUrl: pl.uri, session: session)
+        appendAndPlay(tracks)
     }
 
-    private func replaceAndPlay(forShow show: Show) async {
+    private func appendAndPlay(forShow show: Show) async {
         let episodes = await (try? showService.getShowEpisodes(
             showId: show.id,
             showName: show.name,
             showImages: show.images,
             session: session,
         )) ?? []
-        guard !episodes.isEmpty else { return }
-        playlist.clear()
-        for episode in episodes {
-            playlist.append(episode)
-        }
-        // playTracks plays uris[0] first — newest episode (Spotify default order).
-        await playbackViewModel.playTracks(episodes.map(\.uri), session: session)
+        // Episodes arrive newest-first (Spotify default order); appendAndPlay
+        // starts from the first (newest) episode.
+        appendAndPlay(episodes)
     }
 
     private func pickTrack(_ track: Track) {
         let entry = playlist.append(track)
-        if playbackViewModel.currentTrackUri == nil {
-            playEntry(entry)
-        } else {
-            let uri = track.uri
-            Task { await playbackViewModel.addToQueue(uri: uri, session: session) }
-        }
+        playEntry(entry, resumeFrom: resumeInfo(for: track))
         exitSearch()
+    }
+
+    /// Append the given tracks to the end of the queue (existing entries are
+    /// preserved) and immediately start playing from the first appended track.
+    private func appendAndPlay(_ tracks: [Track]) {
+        guard let first = tracks.first else { return }
+        var firstEntry: MinimalPlaylist.Entry?
+        for track in tracks {
+            let entry = playlist.append(track)
+            if firstEntry == nil { firstEntry = entry }
+        }
+        guard let firstEntry else { return }
+        playEntry(firstEntry, resumeFrom: resumeInfo(for: first))
+    }
+
+    /// Resume position for a partially-played podcast episode, or nil for regular
+    /// tracks / unplayed / finished episodes.
+    private func resumeInfo(for track: Track) -> (uri: String, positionMs: UInt32)? {
+        guard track.fullyPlayed != true, let pos = track.resumePositionMs, pos > 0 else {
+            return nil
+        }
+        return (track.uri, UInt32(clamping: pos))
     }
 
     private func handleEnqueue(_ pick: MinimalSearchPick) {
@@ -330,37 +329,11 @@ struct MinimalPlayerWindow: View {
         Task { await playbackViewModel.play(uriOrUrl: uri, session: session) }
     }
 
-    private func playEntry(_ entry: MinimalPlaylist.Entry) {
+    private func playEntry(_ entry: MinimalPlaylist.Entry, resumeFrom: (uri: String, positionMs: UInt32)? = nil) {
         playlist.currentEntryId = entry.id
         let uris = playlist.urisStarting(at: entry.id)
         guard !uris.isEmpty else { return }
-        Task { await playbackViewModel.playTracks(uris, session: session) }
-    }
-
-    /// Load the full track list into the Minimal playlist and start playback
-    /// at the picked track. Used when the user clicks a single track inside the
-    /// drill-in detail view (album / playlist / show).
-    private func playFromDetail(picked: Track, allTracks: [Track]) {
-        guard !allTracks.isEmpty else { return }
-        playlist.clear()
-        var pickedEntryId: UUID?
-        for track in allTracks {
-            let entry = playlist.append(track)
-            if track.id == picked.id, pickedEntryId == nil {
-                pickedEntryId = entry.id
-            }
-        }
-        guard let pickedEntryId else { return }
-        playlist.currentEntryId = pickedEntryId
-        let uris = playlist.urisStarting(at: pickedEntryId)
-        guard !uris.isEmpty else { return }
-        // Resume a partially-played podcast episode from its saved position.
-        var resumeFrom: (uri: String, positionMs: UInt32)?
-        if picked.fullyPlayed != true, let pos = picked.resumePositionMs, pos > 0 {
-            resumeFrom = (picked.uri, UInt32(clamping: pos))
-        }
         Task { await playbackViewModel.playTracks(uris, session: session, resumeFrom: resumeFrom) }
-        exitSearch()
     }
 
     /// Remove the given entries from the visible list. Local/cosmetic only — the

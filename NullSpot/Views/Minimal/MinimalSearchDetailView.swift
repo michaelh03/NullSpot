@@ -4,7 +4,9 @@
 //
 //  Drill-in view shown when the user picks an album / playlist / podcast from
 //  search results. Loads the entity's tracks (or episodes) and renders them
-//  inline. Row tap enqueues a single track; the header offers Back and Play All.
+//  inline. Row tap appends a single track to the queue and plays it; the header's
+//  Play All appends the whole list and plays from the top. Both keep the existing
+//  queue (they never replace it). The row's trailing "+" enqueues without playing.
 //
 
 import SwiftUI
@@ -20,7 +22,6 @@ struct MinimalSearchDetailView: View {
     @FocusState.Binding var focusedField: MinimalPlayerWindow.Field?
     let onBack: () -> Void
     let onPlayAll: () -> Void
-    let onPlayTrack: (Track, [Track]) -> Void
     let onPickTrack: (Track) -> Void
     let onEnqueueTrack: (Track) -> Void
 
@@ -161,7 +162,7 @@ struct MinimalSearchDetailView: View {
                             progressLabel: progressLabel(for: track),
                             onTap: {
                                 selectedIndex = idx
-                                onPlayTrack(track, tracks)
+                                onPickTrack(track)
                             },
                             onTrailingTap: {
                                 onEnqueueTrack(track)
