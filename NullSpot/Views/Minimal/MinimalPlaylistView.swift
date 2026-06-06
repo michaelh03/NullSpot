@@ -45,6 +45,7 @@ struct MinimalPlaylistView: View {
             playSelected()
             return .handled
         }
+        .onDeleteCommand(perform: deleteSelected)
         .onKeyPress(phases: .down, action: handleKeyPress)
         .onAppear {
             if cursorId == nil {
@@ -64,6 +65,7 @@ struct MinimalPlaylistView: View {
                             isCurrent: entry.id == playlist.currentEntryId,
                             isSelected: selectedIds.contains(entry.id),
                         ) {
+                            focusedField = .playlist
                             selectSingle(entry.id)
                             onPlay(entry)
                         }
@@ -134,10 +136,8 @@ struct MinimalPlaylistView: View {
     }
 
     private func handleKeyPress(_ press: KeyPress) -> KeyPress.Result {
-        if press.key == .delete || press.key == .deleteForward {
-            deleteSelected()
-            return .handled
-        }
+        // Delete/Backspace is handled by `.onDeleteCommand` (the AppKit command
+        // path), which is reliable inside this focusable, button-filled list.
         if press.key == KeyEquivalent("a"), press.modifiers.contains(.command) {
             selectAll()
             return .handled
