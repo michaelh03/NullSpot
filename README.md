@@ -7,8 +7,8 @@
 <p align="center"><strong>A lightweight macOS Spotify player inspired by the classic Winamp.</strong></p>
 
 <p align="center">
-  Native audio, a real-time visualizer, and a tiny footprint — no Electron, no 1 GB of RAM,<br />
-  no per-user Client ID setup. Just log in and play.
+  Native audio, a real-time visualizer, and a tiny footprint — no Electron, no 1 GB of RAM.<br />
+  Simple setup: just log in and play.
 </p>
 
 <p align="center">
