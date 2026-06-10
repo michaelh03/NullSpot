@@ -1,29 +1,59 @@
-# NullSpot
+<p align="center">
+  <img src="images/icon_nullspot.jpg" alt="NullSpot" width="128" />
+</p>
 
-A lightweight Spotify player for macOS.
+<h1 align="center">NullSpot</h1>
 
-**[Website](https://ralph.github.io/NullSpot/)** · **[Download](https://github.com/ralph/NullSpot/releases/latest)**
+<p align="center"><strong>A lightweight macOS Spotify player inspired by the classic Winamp.</strong></p>
 
-> [!IMPORTANT]
-> **Spotify Client ID Required**
-> This app requires your own Spotify Client ID to function. Spotify has [re-enabled developer access](https://developer.spotify.com/blog/2026-02-06-update-on-developer-access-and-platform-security) — you can create a Client ID for free in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard). See [Setting Up Your Client ID](#setting-up-your-client-id) below for instructions and the [February 2026 API changes](https://developer.spotify.com/documentation/web-api/references/changes/february-2026) for details on the current Web API.
+<p align="center">
+  Native audio, a real-time visualizer, and a tiny footprint — no Electron, no 1 GB of RAM.<br />
+  Simple setup: just log in and play.
+</p>
 
-## Screenshots
+<p align="center">
+  <a href="https://github.com/michaelh/nullspot/releases/latest"><strong>Download</strong></a>
+</p>
 
-### Album View
-![Album View](images/screenshot-album-view.png)
+<p align="center">
+  <img src="images/main.png" alt="NullSpot player" width="420" />
+</p>
 
-### Miniplayer
-![Miniplayer](images/screenshot-miniplayer.png)
+> [!NOTE]
+> NullSpot is an unofficial client and is not affiliated with or endorsed by Spotify. A **Spotify Premium** account is required.
+
+## Why NullSpot?
+
+NullSpot streams audio itself through a native engine ([librespot](https://github.com/librespot-org/librespot)) wrapped in a small SwiftUI app — so it stays out of your way and off your fans.
+
+| | Spotify (official) | NullSpot |
+|---|---|---|
+| CPU during playback | ~20% *(ballpark)* | ~5% |
+| Memory | ~1 GB *(ballpark)* | ~80 MB |
+| UI | Electron | Native SwiftUI |
+| Footprint | Full desktop app | Winamp-style mini player |
+
+<sub>NullSpot figures measured on Apple Silicon during steady-state playback (Release build). Official-Spotify figures are rough, observed estimates. Your numbers will vary.</sub>
+
+## Features
+
+- **Winamp-style mini player** — a compact, focused window that gets out of your way
+- **Native audio playback** — streams directly via librespot (no browser, no Web Playback SDK)
+- **Real-time visualizer** — FFT-driven spectrum bars that react to what's playing
+- **Marquee track display** — scrolling now-playing title and artist
+- **Spotify Connect & AirPlay** — play to other devices or route audio to AirPlay speakers
+- **Search everything** — songs, artists, albums, playlists, and podcasts
+- **Persistent queue** — your queue is restored when you reopen the app
+- **Podcast resume** — picks up episodes where you left off
+- **Favorites** — like/unlike tracks, synced with your Spotify library
+- **Volume control** — built right into the player
+
+## Requirements
+
+- macOS 15.0 or later
+- A Spotify **Premium** account
 
 ## Installation
-
-### Direct Download
-
-1. Download the [latest release](https://github.com/michaelh/nullspot/releases/latest)
-2. Extract the ZIP file
-3. Move `NullSpot.app` to your Applications folder
-4. Open NullSpot from Applications
 
 ### Homebrew
 
@@ -31,87 +61,76 @@ A lightweight Spotify player for macOS.
 brew install michaelh/nullspot/nullspot
 ```
 
-## Requirements
+### Direct download
 
-- macOS 26.2 or later
-- Spotify Premium account
+1. Download the [latest release](https://github.com/michaelh/nullspot/releases/latest)
+2. Unzip it and move `NullSpot.app` to your **Applications** folder
+3. Launch NullSpot
 
-## Features
-
-- Lightweight and fast
-- Native macOS app built with SwiftUI
-- Spotify Web API integration
-- Recently played tracks, albums, artists, and playlists
-- Queue management with drag-and-drop reordering
-- Playback controls
-- Search functionality
-- Favorites management
-
-## Setting Up Your Client ID
-
-NullSpot requires a Spotify Client ID. While it's recommended to create a new Spotify app just for NullSpot, you can also use an existing Spotify app—just add `de.rvdh.nullspot://callback` to its Redirect URIs (you can have multiple redirect URIs in one app).
-
-### Option A: Create a New Spotify App (Recommended)
-
-1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
-2. Click **Create app**
-3. Fill in the required fields:
-   - **App name**: Anything you like (e.g., "NullSpot")
-   - **App description**: Anything you like
-   - **Redirect URIs**: Add exactly `de.rvdh.nullspot://callback`
-   - **APIs used**: Select **Web API** and **Web Playback SDK**
-4. Accept the terms and click **Save**
-5. Open your newly created app and go to **Settings**
-6. Copy the **Client ID** (not the Client Secret)
-
-All other fields (Website, Bundle IDs, Android packages) can be left empty.
-
-![Spotify Developer App Settings](images/spotify-developer-app-settings.png)
-
-### Option B: Use an Existing Spotify App
-
-If you already have a Spotify app configured:
-
-1. Go to your app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
-2. Go to **Settings**
-3. Add `de.rvdh.nullspot://callback` to the **Redirect URIs** (you can have multiple)
-4. Save the settings
-5. Copy the **Client ID**
-
-### Configure NullSpot
+## Getting started
 
 1. Open NullSpot
-2. Enter your Client ID on the login screen
-3. Click **Connect with Spotify**
+2. Click **Connect with Spotify**
+3. Authorize NullSpot in the browser window that opens — that's it
 
-Your Client ID will be saved securely in the macOS Keychain and used for all future sessions.
+No Client ID, no developer dashboard, no configuration. NullSpot ships with a built-in,
+production-approved Spotify application ID, so authentication works out of the box. Your
+login is stored securely in the macOS Keychain.
 
-## Keyboard Shortcuts
+## Keyboard shortcuts
 
 ### Playback
 
 | Shortcut | Action |
 |----------|--------|
-| Space | Play / Pause |
-| ⌘ → | Next track |
-| ⌘ ← | Previous track |
-| ⌘ L | Like / Unlike current track |
+| `Space` | Play / Pause |
+| `⌘ →` | Next track |
+| `⌘ ←` | Previous track |
 
-### Navigation
+### Search
 
 | Shortcut | Action |
 |----------|--------|
-| ⌘ 1 | Go to Favorites |
-| ⌘ 2 | Go to Playlists |
-| ⌘ 3 | Go to Albums |
-| ⌘ 4 | Go to Artists |
-| ⌘ F | Focus search field |
-| ⌘ R | Refresh (on startpage) |
+| `⌘ F` / `⌘ K` | Toggle search |
+| `⌘ 1` | Songs |
+| `⌘ 2` | Artists |
+| `⌘ 3` | Albums |
+| `⌘ 4` | Playlists |
+| `⌘ 5` | Podcasts |
 
-## Development
+## How it works
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for build instructions and architecture documentation.
+NullSpot is a SwiftUI app that talks to a Rust core via a C FFI bridge. The Rust layer uses
+[librespot](https://github.com/librespot-org/librespot) for authentication and native audio
+streaming; the Swift layer handles the UI, the Spotify Web API, and audio rendering
+(including AirPlay) through `AVAudioEngine`.
+
+See [DEVELOPMENT.md](DEVELOPMENT.md) for build instructions and a deeper architecture overview.
+
+## Building from source
+
+You'll need Xcode 26.2+ and the [Rust toolchain](https://rustup.rs/).
+
+```bash
+# 1. Build the Rust core
+cd rust && ./build.sh && cd ..
+
+# 2. Build the app (or open NullSpot.xcodeproj in Xcode)
+xcodebuild -scheme NullSpot -destination 'platform=macOS' build
+```
+
+Full details are in [DEVELOPMENT.md](DEVELOPMENT.md).
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Acknowledgments
+
+- Based on [Spotifly](https://github.com/ralph/Spotifly) by **Ralph von der Heyden** — the original project this was forked from.
+- Built on [librespot](https://github.com/librespot-org/librespot), and uses the same
+  production Spotify application ID published by [ncspot](https://github.com/hrkfdn/ncspot).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Released under the MIT License — see [LICENSE](LICENSE) for details.

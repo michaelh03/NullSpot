@@ -127,14 +127,6 @@ struct InfoView: View {
             Text("preferences.copyright \(copyrightYear)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-
-//            Link(destination: URL(string: "https://github.com/ralph/homebrew-nullspot")!) {
-//                HStack(spacing: 4) {
-//                    Image(systemName: "link")
-//                    Text("github.com/ralph/homebrew-nullspot")
-//                }
-//                .font(.callout)
-//            }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 12)
