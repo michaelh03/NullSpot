@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/michaelh/nullspot/releases/latest"><strong>Download</strong></a>
+  <a href="https://github.com/michaelh03/NullSpot/releases/latest"><strong>Download</strong></a>
 </p>
 
 <p align="center">
@@ -58,12 +58,12 @@ NullSpot streams audio itself through a native engine ([librespot](https://githu
 ### Homebrew
 
 ```bash
-brew install michaelh/nullspot/nullspot
+brew install --cask michaelh03/nullspot/nullspot
 ```
 
 ### Direct download
 
-1. Download the [latest release](https://github.com/michaelh/nullspot/releases/latest)
+1. Download the [latest release](https://github.com/michaelh03/NullSpot/releases/latest)
 2. Unzip it and move `NullSpot.app` to your **Applications** folder
 3. Launch NullSpot
 
