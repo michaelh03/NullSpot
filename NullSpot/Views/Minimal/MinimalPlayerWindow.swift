@@ -217,33 +217,48 @@ struct MinimalPlayerWindow: View {
     }
 
     private func appendAndPlay(forAlbum album: Album) async {
-        let tracks = await (try? albumService.getAlbumTracks(albumId: album.id, session: session)) ?? []
-        appendAndPlay(tracks)
+        await appendAndPlay(tracks(forAlbum: album))
     }
 
     private func appendAndPlay(forArtist artist: Artist) async {
-        let tracks = await (try? artistService.fetchArtistTopTracks(
-            artistId: artist.id,
-            session: session,
-        )) ?? []
-        appendAndPlay(tracks)
+        await appendAndPlay(tracks(forArtist: artist))
     }
 
     private func appendAndPlay(forPlaylist pl: Playlist) async {
-        let tracks = await (try? playlistService.getPlaylistTracks(playlistId: pl.id, session: session)) ?? []
-        appendAndPlay(tracks)
+        await appendAndPlay(tracks(forPlaylist: pl))
     }
 
     private func appendAndPlay(forShow show: Show) async {
-        let episodes = await (try? showService.getShowEpisodes(
+        // Episodes arrive newest-first (Spotify default order); appendAndPlay
+        // starts from the first (newest) episode.
+        await appendAndPlay(tracks(forShow: show))
+    }
+
+    // MARK: - Track fetching
+
+    private func tracks(forAlbum album: Album) async -> [Track] {
+        await (try? albumService.getAlbumTracks(albumId: album.id, session: session)) ?? []
+    }
+
+    private func tracks(forArtist artist: Artist) async -> [Track] {
+        await (try? artistService.fetchArtistTopTracks(
+            artistId: artist.id,
+            session: session,
+        )) ?? []
+    }
+
+    private func tracks(forPlaylist pl: Playlist) async -> [Track] {
+        await (try? playlistService.getPlaylistTracks(playlistId: pl.id, session: session)) ?? []
+    }
+
+    private func tracks(forShow show: Show, limit: Int = 50) async -> [Track] {
+        await (try? showService.getShowEpisodes(
             showId: show.id,
             showName: show.name,
             showImages: show.images,
             session: session,
+            limit: limit,
         )) ?? []
-        // Episodes arrive newest-first (Spotify default order); appendAndPlay
-        // starts from the first (newest) episode.
-        appendAndPlay(episodes)
     }
 
     private func pickTrack(_ track: Track) {
@@ -274,53 +289,37 @@ struct MinimalPlayerWindow: View {
         return (track.uri, UInt32(clamping: pos))
     }
 
+    /// Trailing "+" on a search row. Containers (album / artist / playlist / show)
+    /// are expanded into their tracks first: both Spirc's `add_to_queue` and
+    /// `POST /me/player/queue` only accept track and episode URIs, so handing them
+    /// a container URI enqueued nothing and never touched the visible queue.
     private func handleEnqueue(_ pick: MinimalSearchPick) {
         switch pick {
         case let .track(track):
             playlist.append(track)
             Task { await playbackViewModel.addToQueue(uri: track.uri, session: session) }
         case let .album(album):
-            Task {
-                await playbackViewModel.addToQueue(uri: album.uri, session: session)
-                // For album/playlist enqueue, pull the full queue with metadata in one Web API call
-                // instead of letting Mercury's set_queue event trigger N single-track GETs.
-                await queueService.refreshQueue()
-            }
+            Task { await enqueue(tracks(forAlbum: album)) }
         case let .artist(artist):
-            Task { await enqueueTopTracks(forArtist: artist) }
+            Task { await enqueue(tracks(forArtist: artist)) }
         case let .playlist(pl):
-            Task {
-                await playbackViewModel.addToQueue(uri: pl.uri, session: session)
-                await queueService.refreshQueue()
-            }
+            Task { await enqueue(tracks(forPlaylist: pl)) }
         case let .show(show):
-            Task { await enqueueLatestEpisode(forShow: show) }
+            Task { await enqueue(tracks(forShow: show, limit: 1)) }
         }
     }
 
-    private func enqueueTopTracks(forArtist artist: Artist) async {
-        let tracks = await (try? artistService.fetchArtistTopTracks(
-            artistId: artist.id,
-            session: session,
-        )) ?? []
+    /// Append the given tracks to the visible queue and mirror them into the live
+    /// player queue, without disturbing what is currently playing.
+    private func enqueue(_ tracks: [Track]) async {
         guard !tracks.isEmpty else { return }
         for track in tracks {
             playlist.append(track)
             await playbackViewModel.addToQueue(uri: track.uri, session: session)
         }
+        // Pull the full queue with metadata in one Web API call instead of letting
+        // Mercury's set_queue events trigger N single-track GETs.
         await queueService.refreshQueue()
-    }
-
-    private func enqueueLatestEpisode(forShow show: Show) async {
-        let episodes = await (try? showService.getShowEpisodes(
-            showId: show.id,
-            showName: show.name,
-            showImages: show.images,
-            session: session,
-            limit: 1,
-        )) ?? []
-        guard let latest = episodes.first else { return }
-        await playbackViewModel.addToQueue(uri: latest.uri, session: session)
     }
 
     // MARK: - Playback helpers
