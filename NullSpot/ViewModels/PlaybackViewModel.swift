@@ -155,11 +155,12 @@ final class PlaybackViewModel {
         self.session = session
     }
 
-    func forceReinitialize(session: SpotifySession) async {
+    func forceReinitialize(session _: SpotifySession) async {
         isInitialized = false
         isLoading = true
         do {
-            let accessToken = await session.validAccessToken()
+            // librespot needs a token from its own client_id, not the Web API one.
+            let accessToken = try await LibrespotAuth.shared.validAccessToken()
             try await SpotifyPlayer.initialize(accessToken: accessToken)
             for _ in 0 ..< 50 {
                 if SpotifyPlayer.isSpircReady { break }
@@ -185,7 +186,7 @@ final class PlaybackViewModel {
         isLoading = false
     }
 
-    func initializeIfNeeded(session: SpotifySession) async {
+    func initializeIfNeeded(session _: SpotifySession) async {
         if isInitialized { return }
         if let existingTask = initTask {
             await existingTask.value
@@ -196,7 +197,8 @@ final class PlaybackViewModel {
             guard let self else { return }
             isLoading = true
             do {
-                let accessToken = await session.validAccessToken()
+                // librespot needs a token from its own client_id, not the Web API one.
+                let accessToken = try await LibrespotAuth.shared.validAccessToken()
                 try await SpotifyPlayer.initialize(accessToken: accessToken)
 
                 // Wait for Spirc to be ready (poll with timeout)
