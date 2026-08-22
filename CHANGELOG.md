@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-08-22
+
 ### Fixed
 - Trailing `+` on an album (or playlist) row in Minimal search added nothing to the queue. `MinimalPlayerWindow.handleEnqueue` passed the container's own URI to `PlaybackViewModel.addToQueue`, but neither backing path accepts one: Spirc's `add_to_queue` and the Web API's `POST /me/player/queue` are track/episode-only, so the call was a no-op — and the branch never called `playlist.append`, so the visible queue was left untouched either way. Album, playlist and show picks now expand into their tracks first (via the existing `AlbumService`/`PlaylistService`/`ShowService` fetches) and go through a shared `enqueue(_ tracks:)` that appends each track to `MinimalPlaylist` and mirrors it into the live player queue, then refreshes the queue once — the same shape the artist branch already used. The per-entity track fetches shared with Play-All were pulled out into `tracks(forAlbum:)` / `tracks(forArtist:)` / `tracks(forPlaylist:)` / `tracks(forShow:limit:)` helpers.
 
