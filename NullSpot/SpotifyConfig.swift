@@ -42,4 +42,36 @@ enum SpotifyConfig {
         "user-top-read",
         "user-read-playback-position",
     ]
+
+    // MARK: - librespot (Spotify Connect) credentials
+
+    /// Spotify's "keymaster" client_id, used *only* for the librespot session.
+    ///
+    /// This must be distinct from `getClientId()`: librespot's native path
+    /// (clienttoken.spotify.com, the access point, and login5) only accepts
+    /// first-party native client ids. A Web API app id like ncspot's is
+    /// rejected there — clienttoken answers HTTP 400, and login5 answers
+    /// INVALID_CREDENTIALS for stored credentials minted by a different id.
+    ///
+    /// So we run a second PKCE flow with this id purely to obtain the token we
+    /// hand to `SpotifyPlayer.initialize()`. This mirrors spotify-player, which
+    /// uses ncspot's id for the Web API and this id for librespot.
+    nonisolated static let librespotClientId = "65b708073fc0480ea92a077233ca87bd"
+
+    /// Scopes for the librespot token. Playback/Connect only — this token is
+    /// never used for Web API calls.
+    nonisolated static let librespotScopes: [String] = [
+        "user-read-playback-state",
+        "user-modify-playback-state",
+        "user-read-currently-playing",
+        "app-remote-control",
+        "streaming",
+        "playlist-read-private",
+        "playlist-read-collaborative",
+        "user-follow-read",
+        "user-read-playback-position",
+        "user-top-read",
+        "user-read-recently-played",
+        "user-library-read",
+    ]
 }

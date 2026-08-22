@@ -116,10 +116,18 @@ enum SpotifyAuth {
     // MARK: - Public API
 
     /// Initiates the Spotify OAuth flow using a loopback HTTP listener.
+    /// - Parameters:
+    ///   - clientId: The Spotify app to authorize against. Defaults to the Web
+    ///     API client; pass `SpotifyConfig.librespotClientId` for the
+    ///     Connect/playback token.
+    ///   - scopes: The scopes to request for `clientId`.
     /// - Returns: The authentication result containing tokens
     /// - Throws: SpotifyAuthError if authentication fails
     @MainActor
-    static func authenticate() async throws -> SpotifyAuthResult {
+    static func authenticate(
+        clientId: String = SpotifyConfig.getClientId(),
+        scopes: [String] = SpotifyConfig.scopes,
+    ) async throws -> SpotifyAuthResult {
         let codeVerifier = generateCodeVerifier()
         let codeChallenge = generateCodeChallenge(from: codeVerifier)
         let state = generateState()
@@ -127,10 +135,10 @@ enum SpotifyAuth {
         // Build the authorization URL
         var components = URLComponents(string: "https://accounts.spotify.com/authorize")!
         components.queryItems = [
-            URLQueryItem(name: "client_id", value: SpotifyConfig.getClientId()),
+            URLQueryItem(name: "client_id", value: clientId),
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "redirect_uri", value: SpotifyConfig.redirectUri),
-            URLQueryItem(name: "scope", value: SpotifyConfig.scopes.joined(separator: " ")),
+            URLQueryItem(name: "scope", value: scopes.joined(separator: " ")),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "code_challenge_method", value: "S256"),
             URLQueryItem(name: "code_challenge", value: codeChallenge),
@@ -149,7 +157,11 @@ enum SpotifyAuth {
         }
 
         let code = try await codeAwait
-        return try await exchangeCodeForToken(code: code, codeVerifier: codeVerifier)
+        return try await exchangeCodeForToken(
+            code: code,
+            codeVerifier: codeVerifier,
+            clientId: clientId,
+        )
     }
 
     // MARK: - Loopback listener
@@ -235,7 +247,11 @@ enum SpotifyAuth {
     }
 
     /// Exchanges an authorization code for access and refresh tokens
-    private static func exchangeCodeForToken(code: String, codeVerifier: String) async throws -> SpotifyAuthResult {
+    private static func exchangeCodeForToken(
+        code: String,
+        codeVerifier: String,
+        clientId: String,
+    ) async throws -> SpotifyAuthResult {
         let tokenURL = URL(string: "https://accounts.spotify.com/api/token")!
 
         var request = URLRequest(url: tokenURL)
@@ -245,7 +261,7 @@ enum SpotifyAuth {
             "grant_type": "authorization_code",
             "code": code,
             "redirect_uri": SpotifyConfig.redirectUri,
-            "client_id": SpotifyConfig.getClientId(),
+            "client_id": clientId,
             "code_verifier": codeVerifier,
         ])
 
@@ -262,10 +278,16 @@ enum SpotifyAuth {
     }
 
     /// Refreshes the access token using a refresh token.
-    /// - Parameter refreshToken: The refresh token to use
+    /// - Parameters:
+    ///   - refreshToken: The refresh token to use
+    ///   - clientId: The app the refresh token belongs to. Must match the
+    ///     client_id that issued it.
     /// - Returns: The new authentication result containing fresh tokens
     /// - Throws: SpotifyAuthError if refresh fails
-    static func refreshAccessToken(refreshToken: String) async throws -> SpotifyAuthResult {
+    static func refreshAccessToken(
+        refreshToken: String,
+        clientId: String = SpotifyConfig.getClientId(),
+    ) async throws -> SpotifyAuthResult {
         let tokenURL = URL(string: "https://accounts.spotify.com/api/token")!
 
         var request = URLRequest(url: tokenURL)
@@ -274,7 +296,7 @@ enum SpotifyAuth {
         request.httpBody = formURLEncode([
             "grant_type": "refresh_token",
             "refresh_token": refreshToken,
-            "client_id": SpotifyConfig.getClientId(),
+            "client_id": clientId,
         ])
 
         let data: Data

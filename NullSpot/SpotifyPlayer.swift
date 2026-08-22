@@ -430,9 +430,6 @@ private nonisolated func handleSessionConnectedCallback() {
     }
 }
 
-/// Weak reference to the SpotifySession for token requests during reconnection
-private nonisolated(unsafe) var tokenProviderSession: SpotifySession?
-
 /// Registers the active device callback with Rust (fires on every cluster update)
 private nonisolated func registerActiveDeviceCallback() {
     nullspot_register_active_device_callback { deviceIdPtr in
@@ -461,12 +458,13 @@ private nonisolated func registerTokenRequestCallback() {
 private nonisolated func handleTokenRequestCallback() {
     debugLog("SpotifyPlayer", "Token request received from Rust")
     Task { @MainActor in
-        guard let session = tokenProviderSession else {
-            debugLog("SpotifyPlayer", "No session available for token request")
+        // Reconnection needs a librespot-client_id token, same as initial init —
+        // the Web API token is rejected by login5.
+        guard let token = try? await LibrespotAuth.shared.validAccessToken() else {
+            debugLog("SpotifyPlayer", "No librespot token available for token request")
             return
         }
 
-        let token = await session.validAccessToken()
         debugLog("SpotifyPlayer", "Providing fresh token to Rust (\(token.prefix(20))...)")
 
         // Call Rust FFI on background thread
@@ -726,13 +724,6 @@ enum SpotifyPlayer {
         guard result == 0 else {
             throw SpotifyPlayerError.initializationFailed
         }
-    }
-
-    /// Sets the session to use for token requests during automatic reconnection.
-    /// Call this after initializing the player with the session that can provide fresh tokens.
-    @MainActor
-    static func setTokenProvider(_ session: SpotifySession) {
-        tokenProviderSession = session
     }
 
     /// Returns a publisher for queue updates.

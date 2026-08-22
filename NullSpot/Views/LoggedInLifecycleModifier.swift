@@ -78,7 +78,6 @@ struct LoggedInLifecycleModifier: ViewModifier {
                 _ = await (topArtists, topTracks, recentlyPlayed)
 
                 playbackViewModel.setSession(session)
-                SpotifyPlayer.setTokenProvider(session)
 
                 await playbackViewModel.initializeIfNeeded(session: session)
                 await queueService.fetchInitialPlaybackState()

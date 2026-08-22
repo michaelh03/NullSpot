@@ -14,6 +14,9 @@ enum KeychainManager {
     private static let accessTokenKey = "spotify_access_token"
     private static let refreshTokenKey = "spotify_refresh_token"
     private static let expiresAtKey = "spotify_expires_at"
+    private nonisolated static let librespotAccessTokenKey = "librespot_access_token"
+    private nonisolated static let librespotRefreshTokenKey = "librespot_refresh_token"
+    private nonisolated static let librespotExpiresAtKey = "librespot_expires_at"
 
     // MARK: - Public API
 
@@ -103,6 +106,54 @@ enum KeychainManager {
         delete(key: accessTokenKey)
         delete(key: refreshTokenKey)
         delete(key: expiresAtKey)
+        clearLibrespotAuthResult()
+    }
+
+    // MARK: - librespot token
+
+    /// Saves the librespot (Connect/playback) OAuth result. Stored separately
+    /// from the Web API token because it is issued by a different client_id.
+    nonisolated static func saveLibrespotAuthResult(_ result: SpotifyAuthResult) throws {
+        let expiresAt = Date().addingTimeInterval(TimeInterval(result.expiresIn))
+
+        try save(key: librespotAccessTokenKey, data: result.accessToken.data(using: .utf8)!)
+
+        if let refreshToken = result.refreshToken {
+            try save(key: librespotRefreshTokenKey, data: refreshToken.data(using: .utf8)!)
+        }
+
+        try save(key: librespotExpiresAtKey, data: expiresAt.ISO8601Format().data(using: .utf8)!)
+    }
+
+    /// Loads the stored librespot OAuth result, or nil if none is stored.
+    /// The token may be expired — callers should refresh via its refresh token.
+    nonisolated static func loadLibrespotAuthResult() -> SpotifyAuthResult? {
+        guard let accessTokenData = load(key: librespotAccessTokenKey),
+              let accessToken = String(data: accessTokenData, encoding: .utf8),
+              let expiresAtData = load(key: librespotExpiresAtKey),
+              let expiresAtString = String(data: expiresAtData, encoding: .utf8),
+              let expiresAt = try? Date(expiresAtString, strategy: .iso8601)
+        else {
+            return nil
+        }
+
+        var refreshToken: String? = nil
+        if let refreshTokenData = load(key: librespotRefreshTokenKey) {
+            refreshToken = String(data: refreshTokenData, encoding: .utf8)
+        }
+
+        return SpotifyAuthResult(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            expiresIn: UInt64(max(0, expiresAt.timeIntervalSince(Date()))),
+        )
+    }
+
+    /// Clears the stored librespot OAuth data.
+    nonisolated static func clearLibrespotAuthResult() {
+        delete(key: librespotAccessTokenKey)
+        delete(key: librespotRefreshTokenKey)
+        delete(key: librespotExpiresAtKey)
     }
 
     /// Checks if a valid (non-expired) auth result exists
